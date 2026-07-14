@@ -1,0 +1,334 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Para Emy 🌹</title>
+  <link href="https://fonts.googleapis.com/css2?family=Dancing+Script:wght@600;700&family=Poppins:wght@400;500&display=swap" rel="stylesheet"/>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: linear-gradient(135deg, #1a0010 0%, #3d0022 50%, #1a0010 100%);
+      font-family: 'Poppins', sans-serif;
+      padding: 2rem;
+      overflow: hidden;
+    }
+
+    canvas#fogos {
+      position: fixed;
+      top: 0; left: 0;
+      width: 100%; height: 100%;
+      pointer-events: none;
+      z-index: 999;
+      display: none;
+    }
+
+    .card {
+      background: rgba(255,255,255,0.97);
+      border-radius: 28px;
+      padding: 2.5rem 2rem;
+      max-width: 420px;
+      width: 100%;
+      text-align: center;
+      box-shadow: 0 12px 60px rgba(180,0,60,0.35);
+      position: relative;
+      z-index: 1;
+    }
+
+    .foto-container {
+      width: 120px;
+      height: 120px;
+      border-radius: 50%;
+      margin: 0 auto 1.2rem;
+      border: 4px solid #c0395a;
+      overflow: hidden;
+      box-shadow: 0 4px 20px rgba(192,57,90,0.4);
+      background: #f0e0e5;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 42px;
+    }
+
+    .foto-container img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display: block;
+    }
+
+    .titulo {
+      font-family: 'Dancing Script', cursive;
+      font-size: 2.1rem;
+      color: #c0395a;
+      margin-bottom: 0.8rem;
+    }
+
+    .mensagem {
+      font-size: 14.5px;
+      color: #444;
+      line-height: 1.8;
+      margin-bottom: 1.6rem;
+    }
+
+    .mensagem strong { color: #c0395a; font-weight: 500; }
+
+    .detalhe {
+      background: #fff0f5;
+      border: 1.5px dashed #e8a0b4;
+      border-radius: 16px;
+      padding: 0.9rem 1.2rem;
+      margin-bottom: 1.6rem;
+      font-size: 13.5px;
+      color: #8b3050;
+      line-height: 1.7;
+    }
+
+    .detalhe span { font-size: 18px; }
+
+    .btns {
+      display: flex;
+      gap: 50px;
+      justify-content: center;
+      align-items: center;
+      flex-wrap: wrap;
+      margin-bottom: 0.8rem;
+    }
+
+    /* Reserva espaço fixo para o botão Não não sumir do layout */
+    .btn-nao-placeholder {
+      width: 90px;
+      height: 46px;
+      flex-shrink: 0;
+    }
+
+    .btn-sim {
+      background: #c0395a;
+      color: white;
+      border: none;
+      border-radius: 50px;
+      padding: 13px 28px;
+      font-size: 14px;
+      font-family: 'Poppins', sans-serif;
+      cursor: pointer;
+      transition: transform 0.15s, background 0.15s;
+      font-weight: 500;
+      flex-shrink: 0;
+      white-space: nowrap;
+    }
+
+    .btn-sim:hover { background: #a02d4a; transform: scale(1.06); }
+
+    .btn-nao {
+      background: white;
+      color: #999;
+      border: 1.5px solid #ddd;
+      border-radius: 50px;
+      padding: 12px 22px;
+      font-size: 14px;
+      font-family: 'Poppins', sans-serif;
+      cursor: pointer;
+      z-index: 100;
+      flex-shrink: 0;
+      white-space: nowrap;
+      /* começa estático, vira fixed só depois do primeiro toque */
+      position: static;
+    }
+
+    .btn-nao.fugindo {
+      position: fixed;
+    }
+
+    .resposta-sim {
+      display: none;
+      text-align: center;
+    }
+
+    .resposta-sim .emoji-grande {
+      font-size: 52px;
+      margin-bottom: 0.5rem;
+    }
+
+    .resposta-sim h2 {
+      font-family: 'Dancing Script', cursive;
+      font-size: 2rem;
+      color: #c0395a;
+      margin-bottom: 0.8rem;
+    }
+
+    .resposta-sim p { font-size: 14.5px; color: #555; line-height: 1.8; }
+
+    .rodape { font-size: 12px; color: #ccc; margin-top: 1.5rem; }
+
+    @media (max-width: 420px) {
+      body { padding: 1rem; }
+      .card { padding: 2rem 1.2rem; max-width: 100%; }
+      .btn-sim { padding: 12px 20px; font-size: 13.5px; }
+      .btn-nao { padding: 11px 16px; font-size: 13.5px; }
+      .btn-nao-placeholder { width: 75px; }
+    }
+  </style>
+</head>
+<body>
+
+<canvas id="fogos"></canvas>
+
+<div class="card" id="card-convite">
+
+  <div class="foto-container">
+    <img src="SUA_FOTO.jpg" alt="Nossa foto" onerror="this.parentElement.innerHTML='💑'"/>
+  </div>
+
+  <h1 class="titulo">Oi, Emy... 🌹</h1>
+
+  <p class="mensagem">
+    Tem planos para hoje? 😅<br><br>
+    Você toparia <strong>uma noite</strong> para fazer um sushi tomar um vinho e ganhar muitos beijinhos? 💋🍷
+  </p>
+
+  <div class="detalhe">
+    <span>📅</span> <strong>Sábado</strong> às <strong>20h00</strong><br>
+    <span>🍷</span> Vinho, sushi, conversa boa e muito carinho<br>
+    <span>💋</span> E muitos beijinhos, claro!
+  </div>
+
+  <div class="btns">
+    <button class="btn-sim" id="btnSim" onclick="responderSim()">💖 Sim, adorei!</button>
+    <!-- placeholder mantém o espaço depois que o botão vira fixed -->
+    <div class="btn-nao-placeholder" id="placeholder"></div>
+    <button class="btn-nao" id="btnNao" onmouseover="fugir()" onclick="fugir()" ontouchstart="fugir(); event.preventDefault();">Não</button>
+  </div>
+
+  <p class="rodape">feito com amor ♥ especialmente para você</p>
+</div>
+
+<div class="card resposta-sim" id="card-sim">
+  <div class="emoji-grande">🎉🥂💕</div>
+  <h2>Irruuuuuulll!</h2>
+  <p>
+    Então está <strong>combinado!</strong><br><br>
+    <strong>Sábado às 18hrs</strong> te espero para um vinho especial e muitos beijinhos. 🍷💋<br><br>
+    Mal posso esperar! 😊✨
+  </p>
+  <p class="rodape" style="margin-top:1.2rem;">feito com amor ♥ só pra você, Emilly</p>
+</div>
+
+<script>
+  let tentativas = 0;
+  let jafugiu = false;
+
+  function fugir() {
+    const btn = document.getElementById('btnNao');
+    const btnSim = document.getElementById('btnSim');
+
+    // Primeira vez: trava a posição atual e vira fixed
+    if (!jafugiu) {
+      const rect = btn.getBoundingClientRect();
+      btn.style.left = rect.left + 'px';
+      btn.style.top  = rect.top  + 'px';
+      btn.classList.add('fugindo');
+      // mostra o placeholder para não deslocar o botão Sim
+      document.getElementById('placeholder').style.display = 'block';
+      jafugiu = true;
+      // pequeno delay antes de mover, senão já some no primeiro toque
+      setTimeout(moverBotao, 50);
+    } else {
+      moverBotao();
+    }
+
+    // trava o botão Sim por 350ms pra evitar toque acidental ao fugir no celular
+    btnSim.style.pointerEvents = 'none';
+    setTimeout(() => { btnSim.style.pointerEvents = 'auto'; }, 350);
+  }
+
+  function moverBotao() {
+    const btn = document.getElementById('btnNao');
+    tentativas++;
+    const margem = 16;
+    const maxX = window.innerWidth  - btn.offsetWidth  - margem;
+    const maxY = window.innerHeight - btn.offsetHeight - margem;
+    const x = Math.max(margem, Math.floor(Math.random() * maxX));
+    const y = Math.max(margem, Math.floor(Math.random() * maxY));
+    btn.style.left = x + 'px';
+    btn.style.top  = y + 'px';
+
+    const frases = ['Hmm...','Tem certeza?','Pensa bem!','Vai não?','Reconsidere!','😅','Me dá uma chance!','Por favor?','🥺'];
+    btn.textContent = frases[Math.min(tentativas - 1, frases.length - 1)];
+  }
+
+  function responderSim() {
+    document.getElementById('card-convite').style.display = 'none';
+    document.getElementById('btnNao').style.display = 'none';
+    document.getElementById('card-sim').style.display = 'block';
+    iniciarFogos();
+    setTimeout(pararFogos, 6000);
+    const msg = encodeURIComponent('Sim! Eu topei! 💖🍷 Sábado às 18hrs te vejo! 😘');
+    setTimeout(() => window.open('https://wa.me/5569984417574?text=' + msg, '_blank'), 2000);
+  }
+
+  // ---- Fogos de artifício ----
+  const canvas = document.getElementById('fogos');
+  const ctx    = canvas.getContext('2d');
+  let particulas = [], animLoop = null;
+
+  function iniciarFogos() {
+    canvas.style.display = 'block';
+    canvas.width  = window.innerWidth;
+    canvas.height = window.innerHeight;
+    particulas = [];
+    let count = 0;
+    function lancar() {
+      criarExplosao(
+        Math.random() * canvas.width * 0.8 + canvas.width * 0.1,
+        Math.random() * canvas.height * 0.5 + 80
+      );
+      count++;
+      if (count < 18) setTimeout(lancar, 280);
+    }
+    lancar();
+    animar();
+  }
+
+  function pararFogos() {
+    cancelAnimationFrame(animLoop);
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    canvas.style.display = 'none';
+  }
+
+  function criarExplosao(x, y) {
+    const cores = ['#ff4d6d','#ff9f1c','#ffe66d','#a0c4ff','#ff85a1','#fff','#c77dff','#ff6b6b','#f8edeb'];
+    const cor = cores[Math.floor(Math.random() * cores.length)];
+    const qtd = 80 + Math.floor(Math.random() * 40);
+    for (let i = 0; i < qtd; i++) {
+      const ang = (Math.PI * 2 / qtd) * i;
+      const vel = 2.5 + Math.random() * 4;
+      particulas.push({ x, y,
+        vx: Math.cos(ang) * vel, vy: Math.sin(ang) * vel,
+        alpha: 1, cor, raio: 2 + Math.random() * 2,
+        decay: 0.013 + Math.random() * 0.01 });
+    }
+  }
+
+  function animar() {
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    particulas = particulas.filter(p => p.alpha > 0.02);
+    particulas.forEach(p => {
+      p.x += p.vx; p.y += p.vy; p.vy += 0.06;
+      p.alpha -= p.decay; p.vx *= 0.98;
+      ctx.globalAlpha = p.alpha;
+      ctx.beginPath();
+      ctx.arc(p.x, p.y, p.raio, 0, Math.PI * 2);
+      ctx.fillStyle = p.cor;
+      ctx.fill();
+    });
+    ctx.globalAlpha = 1;
+    animLoop = requestAnimationFrame(animar);
+  }
+</script>
+</body>
+</html>
